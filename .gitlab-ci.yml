@@ -7,29 +7,29 @@ image: moreillon/ci-dind:4bca50d7
 services:
   - name: docker:19.03.12-dind
 
-containerization:
-  stage: containerization
-  tags: 
-    - dind
-  before_script:
-    - docker login -u ${CI_REGISTRY_USER} -p ${CI_REGISTRY_PASSWORD} ${CI_REGISTRY}
-  script:
-    - docker build --no-cache -t ${IMAGE_NAME} .
-    - docker push ${IMAGE_NAME}
+# containerization:
+#   stage: containerization
+#   tags: 
+#     - dind
+#   before_script:
+#     - docker login -u ${CI_REGISTRY_USER} -p ${CI_REGISTRY_PASSWORD} ${CI_REGISTRY}
+#   script:
+#     - docker build --no-cache -t ${IMAGE_NAME} .
+#     - docker push ${IMAGE_NAME}
 
-test:
-  stage: test
-  tags: 
-    - dind
+# test:
+#   stage: test
+#   tags: 
+#     - dind
   
-  script:
-    - docker run -dp 3000:3000 ${IMAGE_NAME}
-    - docker rmi -f ${IMAGE_NAME}
+#   script:
+#     - docker run -dp 3000:3000 ${IMAGE_NAME}
+#     - docker rmi -f ${IMAGE_NAME}
 
 deployment:
   stage: deployment
   tags:
     - dind
   script:
-    kubectl get pods
+    - kubectl get pods
 
