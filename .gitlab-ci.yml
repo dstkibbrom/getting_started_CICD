@@ -35,8 +35,9 @@ deployment:
   tags:
     - watanabe-shell
   script:
-    - envsubst < kubernetes_manifest.yml | kubectl apply -f -
-    - kubectl rollout restart deployment/${APPLICATION_NAME_BASE}
+    - kubectl apply -f kubernetes_manifest.yml
+    # - envsubst < kubernetes_manifest.yml | kubectl apply -f -
+    # - kubectl rollout restart deployment/${APPLICATION_NAME_BASE}
     # - kubectl rollout restart deployment/${APPLICATION_NAME_PROD}
   environment:
     name: production
