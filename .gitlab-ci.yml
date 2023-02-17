@@ -1,6 +1,5 @@
 stages:
   - containerization
-  - build
   - test
   - deployment 
 
@@ -8,9 +7,9 @@ image: moreillon/ci-dind:4bca50d7
 services:
   - name: docker:19.03.12-dind
 
-docker-build-master:
+containerization:
   image: docker:latest
-  stage: build
+  stage: containerization
   tags: 
     - dind
   before_script:
