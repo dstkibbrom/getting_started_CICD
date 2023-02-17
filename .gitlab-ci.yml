@@ -31,5 +31,5 @@ deployment:
   tags:
     - dind
   script:
-    - kubectl get pods
+    - microk8s.kubectl get pods
 
