@@ -3,8 +3,6 @@ stages:
   - test
   - deployment 
 
-image: docker
-
 variables:
   APPLICATION_NAME_BASE: simple_cicd
   APPLICATION_NAME: ${GROUP_NAME}/${APPLICATION_NAME_BASE}
@@ -14,7 +12,7 @@ variables:
 containerization:
   stage: containerization
   tags: 
-    - dind
+    - watanabe-shell
   before_script:
     - docker login -u ${CI_REGISTRY_USER} -p ${CI_REGISTRY_PASSWORD} ${CI_REGISTRY}
   script:
@@ -24,7 +22,7 @@ containerization:
 test:
   stage: test
   tags: 
-    - dind
+    - watanabe-shell
   
   script:
     - docker run -dp 3000:3000 ${IMAGE_NAME}
