@@ -39,7 +39,7 @@ deployment:
     # - envsubst < kubernetes_manifest.yml | kubectl apply -f -
     # - kubectl rollout restart deployment/${APPLICATION_NAME_BASE}
     # - kubectl rollout restart deployment/${APPLICATION_NAME_PROD}
-    - kubectl delete -f kubernetes_manifest.yml
+    # - kubectl delete -f kubernetes_manifest.yml
   environment:
     name: production
     kubernetes:
