@@ -14,11 +14,11 @@ docker-build-master:
   tags: 
     - dind
   before_script:
-    - docker login -u ${CI_REGISTRY_USER} -p ${CI_REGISTRY_PASSWORD} ${CI_REGISTR}
+    - docker login -u ${CI_REGISTRY_USER} -p ${CI_REGISTRY_PASSWORD} ${CI_REGISTRY}
   script:
-    - docker build --no-cache -t ${CI_REGISTR} .
-    - docker push $CI_REGISTR}
-    - docker rmi ${CI_REGISTR} 
+    - docker build --no-cache -t ${CI_REGISTRY} .
+    - docker push $CI_REGISTRY}
+    - docker rmi ${CI_REGISTRY} 
 
 test:
   stage: test
