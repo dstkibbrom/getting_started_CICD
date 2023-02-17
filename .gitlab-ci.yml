@@ -3,30 +3,28 @@ stages:
   - test
   - deployment 
 
-variables:
-  APPLICATION_NAME_BASE: simple_cicd
-  APPLICATION_NAME: ${GROUP_NAME}/${APPLICATION_NAME_BASE}
-  VERSION: 2e4db185
-  KUBERNETES_PORT_PROD: 30215
+image: moreillon/ci-dind:4bca50d7
+services:
+  - name: docker:19.03.12-dind
 
-containerization:
-  stage: containerization
-  tags: 
-    - watanabe-shell
-  before_script:
-    - docker login -u ${CI_REGISTRY_USER} -p ${CI_REGISTRY_PASSWORD} ${CI_REGISTRY}
-  script:
-    - docker build --no-cache -t ${IMAGE_NAME} .
-    - docker push ${IMAGE_NAME}
+# containerization:
+#   stage: containerization
+#   tags: 
+#     - dind
+#   before_script:
+#     - docker login -u ${CI_REGISTRY_USER} -p ${CI_REGISTRY_PASSWORD} ${CI_REGISTRY}
+#   script:
+#     - docker build --no-cache -t ${IMAGE_NAME} .
+#     - docker push ${IMAGE_NAME}
 
-test:
-  stage: test
-  tags: 
-    - watanabe-shell
+# test:
+#   stage: test
+#   tags: 
+#     - dind
   
-  script:
-    - docker run -dp 3000:3000 ${IMAGE_NAME}
-    - docker rmi -f ${IMAGE_NAME}
+#   script:
+#     - docker run -dp 3000:3000 ${IMAGE_NAME}
+#     - docker rmi -f ${IMAGE_NAME}
 
 deployment:
   stage: deployment
@@ -37,7 +35,7 @@ deployment:
     # - envsubst < kubernetes_manifest.yml | kubectl apply -f -
     # - kubectl rollout restart deployment/${APPLICATION_NAME_BASE}
     # - kubectl rollout restart deployment/${APPLICATION_NAME_PROD}
-    # - kubectl delete -f kubernetes_manifest.yml
+    - kubectl delete -f kubernetes_manifest.yml
   environment:
     name: production
     kubernetes:
