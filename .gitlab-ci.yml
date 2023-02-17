@@ -25,7 +25,7 @@ test:
   tags: 
     - dind
   script:
-    - echo "This job tests something"
+    - docker run -dp 3000:3000 $(IMAGE_NAME)
 
 deployment:
   stage: deployment
