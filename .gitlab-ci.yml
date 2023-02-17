@@ -31,5 +31,5 @@ deployment:
   tags:
     - dind
   script:
-    - kubectl apply -f kubernetes_manifest.yml
+    - envsubst < kubernetes_manifest.yml | kubectl apply -f -
 
