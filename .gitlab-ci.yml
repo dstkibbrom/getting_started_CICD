@@ -4,9 +4,6 @@ stages:
   - deployment 
 
 image: docker:19.03.12-dind
-services:
-  - name: docker:19.03.12-dind
-
 # containerization:
 #   stage: containerization
 #   tags: 
