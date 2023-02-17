@@ -1,22 +1,27 @@
+stages:
+  - containerization
+  - test
+  - deployment 
+
 image: moreillon/ci-dind:4bca50d7
 services:
   - name: docker:19.03.12-dind
 
-build-job:
+containerization:
   stage: build
   tags: 
     - dind
   script:
     - echo "Hello, $GITLAB_USER_LOGIN!"
 
-test-job1:
+test:
   stage: test
   tags: 
     - dind
   script:
     - echo "This job tests something"
 
-test-job2:
+deployment:
   stage: test
   tags: 
     - dind
