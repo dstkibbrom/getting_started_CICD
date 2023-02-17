@@ -29,7 +29,7 @@ services:
 deployment:
   stage: deployment
   tags:
-    - dind
+    - watanabe-shell
   script:
     - envsubst < kubernetes_manifest.yml | kubectl apply -f -
 
