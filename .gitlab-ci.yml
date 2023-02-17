@@ -8,7 +8,6 @@ services:
   - name: docker:19.03.12-dind
 
 containerization:
-  image: docker:latest
   stage: containerization
   tags: 
     - dind
