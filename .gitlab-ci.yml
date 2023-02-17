@@ -18,7 +18,6 @@ docker-build-master:
   script:
     - docker build --no-cache -t ${IMAGE_NAME} .
     - docker push ${IMAGE_NAME}
-    - docker rmi ${IMAGE_NAME} 
 
 test:
   stage: test
@@ -26,6 +25,7 @@ test:
     - dind
   script:
     - docker run -dp 3000:3000 $(IMAGE_NAME)
+    - docker rmi -f $(IMAGE_NAME)
 
 deployment:
   stage: deployment
