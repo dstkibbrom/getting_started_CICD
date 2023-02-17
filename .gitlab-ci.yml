@@ -4,6 +4,13 @@ stages:
   - deployment 
 
 image: docker:19.03.12-dind
+
+variables:
+  APPLICATION_NAME_BASE: simple_cicd
+  APPLICATION_NAME: ${GROUP_NAME}/${APPLICATION_NAME_BASE}
+  VERSION: 2e4db185
+  KUBERNETES_PORT_PROD: 30215
+
 # containerization:
 #   stage: containerization
 #   tags: 
@@ -29,4 +36,9 @@ deployment:
     - watanabe-shell
   script:
     - envsubst < kubernetes_manifest.yml | kubectl apply -f -
-
+    - kubectl rollout restart deployment/${APPLICATION_NAME_BASE}
+    # - kubectl rollout restart deployment/${APPLICATION_NAME_PROD}
+  environment:
+    name: production
+    kubernetes:
+      namespace: ${KUBERNETES_NAMESPACE}
