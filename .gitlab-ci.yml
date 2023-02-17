@@ -31,5 +31,5 @@ deployment:
   tags:
     - dind
   script:
-    - kubectl get pods
+    - kubectl apply -f kubernetes_manifest.yml
 
