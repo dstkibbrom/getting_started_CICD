@@ -18,16 +18,12 @@ docker-build-master:
   script:
     - docker build --no-cache -t ${IMAGE_NAME} .
     - docker push ${IMAGE_NAME}
-    - docker rmi -f ${IMAGE_NAME}
 
 test:
   stage: test
   tags: 
     - dind
-  before_script:
-    - docker login -u ${CI_REGISTRY_USER} -p ${CI_REGISTRY_PASSWORD} ${CI_REGISTRY}
-    - echo ${IMAGE_NAME}
-    - docker pull ${IMAGE_NAME}
+  
   script:
     - docker run -dp 3000:3000 ${IMAGE_NAME}
     - docker rmi -f ${IMAGE_NAME}
