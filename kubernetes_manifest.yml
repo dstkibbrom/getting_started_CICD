@@ -1,3 +1,33 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: bb-entrypoint
+  namespace: default
+spec:
+  type: NodePort
+  selector:
+    bb: web
+  ports:
+  - port: 3000
+    targetPort: 3000
+    nodePort: 30001
+
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: todoapp-pv-claimbb-demo-57f76f6b57-5lndg
+    bb: web
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 20Gi
+
+---
+
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -15,19 +45,18 @@ spec:
     spec:
       containers:
       - name: bb-site
-        image: kibromdst/clockbox
+        image: kibromdst/getting-started
         imagePullPolicy: Always
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: bb-entrypoint
-  namespace: default
-spec:
-  type: NodePort
-  selector:
-    bb: web
-  ports:
-  - port: 3000
-    targetPort: 3000
-    nodePort: 30001
+        env: 
+        - name: MYSQL_DATABASE
+          value: todos
+        - name: MYSQL_ROOT_PASSWORD
+          value: secret
+        volumeMounts: 
+        - name: todoapp-persistent-storage
+          mountPath: /var/www/html
+      volumes:
+      - name: todoapp-persistent-storage
+        persistentVolumeClaim:
+          claimName: todoapp-pv-claim
+    

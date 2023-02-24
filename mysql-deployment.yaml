@@ -1,0 +1,66 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: todoapp-mysql
+  labels:
+    bb: web
+spec:
+  ports:
+    - port: 3306
+  selector:
+    bb: web
+    tier: mysql
+  clusterIP: None
+
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mysql-pv-claim
+  labels:
+    app: todoapp
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 20Gi
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: todoapp-mysql
+  labels:
+    app: todoapp
+spec:
+  selector:
+    matchLabels:
+      app: todoapp
+      tier: mysql
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: todoapp
+        tier: mysql
+    spec:
+      containers:
+      - image: mysql:8.0
+        name: mysql
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          value: secret
+        ports:
+        - containerPort: 3306
+          name: mysql
+        volumeMounts:
+        - name: mysql-persistent-storage
+          mountPath: /var/lib/mysql
+      volumes:
+      - name: mysql-persistent-storage
+        persistentVolumeClaim:
+          claimName: mysql-pv-claim

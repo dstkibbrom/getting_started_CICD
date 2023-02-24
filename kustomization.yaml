@@ -1,0 +1,7 @@
+secretGenerator:
+- name: mysql-pass
+  literals:
+  - password=secret
+resources:
+  - mysql-deployment.yaml
+  - frontend-deployment.yaml
