@@ -8,7 +8,8 @@ services:
 
 variables:
   APPLICATION_NAME: todo-app
-  CONTAINER_IMAGE: ${CONTAINER_REGISTRY_URL}/kibrom/${APPLICATION_NAME}
+  REPO_NAME: kibrom/${APPLICATION_NAME}
+  CONTAINER_IMAGE: ${CONTAINER_REGISTRY_URL}/${REPO_NAME}
   CONTAINER_IMAGE_TAGGED: ${CONTAINER_IMAGE}:${CI_COMMIT_SHORT_SHA}
   K8S_ECR_SECRET_NAME: ecr-credentials
   K8S_NODEPORT: 30010
@@ -24,7 +25,7 @@ build:
   before_script:
     # Create repository if needed
     - >
-      aws ecr create-repository --repository-name ${APPLICATION_NAME}
+      aws ecr create-repository --repository-name ${REPO_NAME}
       || echo "Repository might have already existed"
     # Log in to the registry (AWS credentials are stored as GitLab env variables)
     - >
