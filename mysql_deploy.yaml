@@ -1,14 +1,14 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: todoapp-mysql
+  name: wordpress-mysql
   labels:
-    bb: web
+    app: wordpress
 spec:
   ports:
     - port: 3306
   selector:
-    bb: web
+    app: wordpress
     tier: mysql
   clusterIP: None
 
@@ -19,7 +19,7 @@ kind: PersistentVolumeClaim
 metadata:
   name: mysql-pv-claim
   labels:
-    app: todoapp
+    app: wordpress
 spec:
   accessModes:
     - ReadWriteOnce
@@ -32,28 +32,31 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: todoapp-mysql
+  name: wordpress-mysql
   labels:
-    app: todoapp
+    app: wordpress
 spec:
   selector:
     matchLabels:
-      app: todoapp
+      app: wordpress
       tier: mysql
   strategy:
     type: Recreate
   template:
     metadata:
       labels:
-        app: todoapp
+        app: wordpress
         tier: mysql
     spec:
       containers:
-      - image: mysql:8.0
+      - image: mysql
         name: mysql
         env:
         - name: MYSQL_ROOT_PASSWORD
           value: secret
+        - name: MYSQL_DATABASE
+          value: todos
+          
         ports:
         - containerPort: 3306
           name: mysql

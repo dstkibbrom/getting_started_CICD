@@ -1,6 +1,6 @@
 services:
   app:
-    image: kibromdst/clockbox
+    image: kibromdst/getting-started
     ports:
       - 3000:3000
     volumes:
