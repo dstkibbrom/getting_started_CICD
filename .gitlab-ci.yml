@@ -45,7 +45,7 @@ deploy:
   stage: deploy
   tags:
     # Using internal runner because might not have access to crickets server from AWS
-    - internal
+    - watanabe-shell
   only:
     - mast
     - main
