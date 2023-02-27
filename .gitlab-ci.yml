@@ -1,41 +1,49 @@
 stages:
   - containerization
-  - test
   - deployment 
 
-image: moreillon/ci-dind:4bca50d7
-services:
-  - name: docker:19.03.12-dind
+# image: moreillon/ci-dind:4bca50d7
+# services:
+#   - name: docker:19.03.12-dind
+variables:
+  CONTAINER_IMAGE_NAME: todoapp
+containerization:
+  stage: containerization
+  tags: 
+    - watanabe-shell
+  before_script:
 
-# containerization:
-#   stage: containerization
-#   tags: 
-#     - dind
-#   before_script:
-#     - docker login -u ${CI_REGISTRY_USER} -p ${CI_REGISTRY_PASSWORD} ${CI_REGISTRY}
-#   script:
-#     - docker build --no-cache -t ${IMAGE_NAME} .
-#     - docker push ${IMAGE_NAME}
+    - echo ${CONTAINER_REGISTRY_URL}
+    - >
+      aws ecr create-repository --repository-name ${CONTAINER_IMAGE_NAME}
+      || echo "Repository might have already existed"
+    
+    # Log in to the registry (AWS credentials are stored as GitLab env variables)
+    - >
+      aws ecr get-login-password
+      | docker login
+      --username AWS
+      --password-stdin
+      ${CONTAINER_REGISTRY_URL}
 
-# test:
-#   stage: test
-#   tags: 
-#     - dind
-  
-#   script:
-#     - docker run -dp 3000:3000 ${IMAGE_NAME}
-#     - docker rmi -f ${IMAGE_NAME}
+
+  script:
+    - docker build --no-cache -t ${CONTAINER_IMAGE_NAME} . 
+    # - docker build --no-cache -t ${CONTAINER_IMAGE_DETECTRON2} --build-arg registry=$REGISTRY_BASE . 
+    
+    # # Push the container image to the container registry
+    - docker push ${CONTAINER_IMAGE_NAME}
+    - docker rmi ${CONTAINER_IMAGE_NAME}
+
+
 
 deployment:
   stage: deployment
   tags:
     - watanabe-shell
   script:
-    - kubectl apply -f kubernetes_manifest.yml
-    # - envsubst < kubernetes_manifest.yml | kubectl apply -f -
-    # - kubectl rollout restart deployment/${APPLICATION_NAME_BASE}
-    # - kubectl rollout restart deployment/${APPLICATION_NAME_PROD}
-    # - kubectl delete -f kubernetes_manifest.yml
+    - kubectl apply -k ./
+
   environment:
     name: production
     kubernetes:
