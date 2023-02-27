@@ -1,50 +1,68 @@
 stages:
-  - containerization
-  - deployment 
+  - build
+  - deploy
 
-# image: moreillon/ci-dind:4bca50d7
-# services:
-#   - name: docker:19.03.12-dind
+image: moreillon/ci-dind:4bca50d7
+services:
+  - name: docker:19.03.12-dind
+
 variables:
-  CONTAINER_IMAGE_NAME: todoapp
-containerization:
-  stage: containerization
-  tags: 
-    - watanabe-shell
-  before_script:
+  APPLICATION_NAME: todo-app
+  CONTAINER_IMAGE: ${CONTAINER_REGISTRY_URL}/kibrom/${APPLICATION_NAME}
+  CONTAINER_IMAGE_TAGGED: ${CONTAINER_IMAGE}:${CI_COMMIT_SHORT_SHA}
+  K8S_ECR_SECRET_NAME: ecr-credentials
+  K8S_NODEPORT: 30010
 
-    - echo ${CONTAINER_REGISTRY_URL}
+
+build:
+  stage: build
+  tags:
+    - dind
+  only:
+    - master
+  before_script:
+    # Create repository if needed
     - >
-      aws ecr create-repository --repository-name ${CONTAINER_IMAGE_NAME}
+      aws ecr create-repository --repository-name ${APPLICATION_NAME}
       || echo "Repository might have already existed"
-    
     # Log in to the registry (AWS credentials are stored as GitLab env variables)
     - >
       aws ecr get-login-password
       | docker login
       --username AWS
       --password-stdin
-      ${CONTAINER_REGISTRY_URL}
-
-
+      ${AWS_ECR_URL}
   script:
-    - docker build --no-cache -t ${CONTAINER_IMAGE_NAME} . 
-    # - docker build --no-cache -t ${CONTAINER_IMAGE_DETECTRON2} --build-arg registry=$REGISTRY_BASE . 
-    
-    # # Push the container image to the container registry
-    - docker push ${CONTAINER_IMAGE_NAME}
-    - docker rmi ${CONTAINER_IMAGE_NAME}
+    # Build the container image
+    - docker build -t ${CONTAINER_IMAGE_TAGGED} .
+    # Push container images to registry
+    - docker push ${CONTAINER_IMAGE_TAGGED}
 
 
-
-deployment:
-  stage: deployment
+deploy:
+  stage: deploy
   tags:
-    - watanabe-shell
+    # Using internal runner because might not have access to crickets server from AWS
+    - internal
+  only:
+    - master
+  before_script:
+    # Creating namespace
+    - kubectl create namespace kibrom --dry-run=client -o yaml | kubectl apply -f -
+    # Create a secret with ECR credentials for K8s to pull
+    # Here, we use apply to update it
+    # https://stackoverflow.com/questions/47369351/kubectl-apply-vs-kubectl-create
+    - >
+      kubectl create secret docker-registry ${K8S_ECR_SECRET_NAME}
+      --docker-server=${AWS_ECR_URL}
+      --docker-username=AWS
+      --docker-password $(aws ecr get-login-password)
+      --dry-run=client -o yaml
+      | kubectl apply -f -
   script:
-    - kubectl apply -k ./
-
+    # Apply the manifest
+    - envsubst < app_deploy.yml | kubectl apply -f -
   environment:
     name: production
     kubernetes:
-      namespace: ${KUBERNETES_NAMESPACE}
+      namespace: kibrom
