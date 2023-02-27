@@ -47,7 +47,7 @@ deploy:
     # Using internal runner because might not have access to crickets server from AWS
     - watanabe-shell
   only:
-    - mast
+    - master
     - main
   before_script:
     # Creating namespace
@@ -64,7 +64,7 @@ deploy:
       | kubectl apply -f -
   script:
     # Apply the manifest
-    - envsubst < app_deploy.yml | kubectl apply -f -
+    - envsubst < app_deploy.yaml | kubectl apply -f -
   environment:
     name: production
     kubernetes:
