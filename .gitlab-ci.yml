@@ -20,6 +20,7 @@ build:
     - dind
   only:
     - master
+    - main
   before_script:
     # Create repository if needed
     - >
@@ -45,7 +46,8 @@ deploy:
     # Using internal runner because might not have access to crickets server from AWS
     - internal
   only:
-    - master
+    - mast
+    - main
   before_script:
     # Creating namespace
     - kubectl create namespace kibrom --dry-run=client -o yaml | kubectl apply -f -
